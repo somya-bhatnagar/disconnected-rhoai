@@ -2,8 +2,6 @@
 
 Slide decks for **Models as a Service (MaaS)** testing on a disconnected OpenShift AI cluster.
 
-By [Somya Bhatnagar](https://github.com/somya-bhatnagar) · tracked in [RHOAIENG-38241](https://issues.redhat.com/browse/RHOAIENG-38241)
-
 ## Live decks
 
 | Release | Deck |
