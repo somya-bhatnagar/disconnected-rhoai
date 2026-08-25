@@ -6,7 +6,8 @@ Slide decks for **Models as a Service (MaaS)** testing on a disconnected OpenShi
 
 | Release | Deck |
 | --- | --- |
-| RHOAI 3.4 | [https://somya-bhatnagar.github.io/disconnected-rhoai/](https://somya-bhatnagar.github.io/disconnected-rhoai/) |
+| Home | [https://somya-bhatnagar.github.io/disconnected-rhoai/](https://somya-bhatnagar.github.io/disconnected-rhoai/) |
+| RHOAI 3.4 | [https://somya-bhatnagar.github.io/disconnected-rhoai/3.4.html](https://somya-bhatnagar.github.io/disconnected-rhoai/3.4.html) |
 | RHOAI 3.5 GA | [https://somya-bhatnagar.github.io/disconnected-rhoai/3.5.html](https://somya-bhatnagar.github.io/disconnected-rhoai/3.5.html) |
 
 Use **arrow keys**, **space**, or the footer buttons to move through slides. Switch versions from the **3.4 / 3.5** links in the footer.
@@ -23,9 +24,10 @@ Use **arrow keys**, **space**, or the footer buttons to move through slides. Swi
 python3 -m http.server 8765
 ```
 
-Then open [http://127.0.0.1:8765/](http://127.0.0.1:8765/) for 3.4 or [http://127.0.0.1:8765/3.5.html](http://127.0.0.1:8765/3.5.html) for 3.5.
+Then open [http://127.0.0.1:8765/](http://127.0.0.1:8765/) for the home page, [http://127.0.0.1:8765/3.4.html](http://127.0.0.1:8765/3.4.html) for 3.4, or [http://127.0.0.1:8765/3.5.html](http://127.0.0.1:8765/3.5.html) for 3.5.
 
 ## Files
 
-- `index.html` — RHOAI 3.4 deck
+- `index.html` — home page
+- `3.4.html` — RHOAI 3.4 deck
 - `3.5.html` — RHOAI 3.5 GA deck
