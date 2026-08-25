@@ -359,6 +359,16 @@
       font-size: 12px;
     }
 
+    .ver {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .ver a { color: var(--muted); text-decoration: none; }
+    .ver a.on { color: var(--ink); font-weight: 600; }
+
     a { color: var(--ink); }
 
     .stack { display: flex; flex-direction: column; gap: 16px; }
@@ -755,6 +765,10 @@
   <nav class="nav">
     <button type="button" id="prev">← Previous</button>
     <div class="progress"><span id="page">1</span> / <span id="total">12</span> · <span id="label">Title</span></div>
+    <div class="ver">
+      <a class="on" href="index.html">3.4</a>
+      <a href="3.5.html">3.5</a>
+    </div>
     <div class="hint">Arrow keys · Space</div>
     <button type="button" id="next">Next →</button>
   </nav>

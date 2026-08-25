@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Disconnected Environment — RHOAI 3.5 · Somya Bhatnagar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;700;900&family=Red+Hat+Mono:wght@400;500&family=Red+Hat+Text:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0c0c0c;
+      --bg-2: #161616;
+      --bg-3: #1f1f1f;
+      --ink: #f4f4f4;
+      --muted: #a8a8a8;
+      --dim: #6f6f6f;
+      --red: #c9190b;
+      --red-bright: #ee0000;
+      --line: #2c2c2c;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Red Hat Text", sans-serif;
+      overflow: hidden;
+    }
+
+    .deck { height: 100%; width: 100%; position: relative; }
+
+    .slide {
+      display: none;
+      height: 100%;
+      width: 100%;
+      padding: 56px 72px 88px;
+      position: absolute;
+      inset: 0;
+      overflow: auto;
+    }
+
+    .slide.active { display: flex; flex-direction: column; }
+
+    .slide.title-slide {
+      padding: 0;
+      background: var(--bg);
+      flex-direction: row;
+    }
+
+    .title-rail { width: 18px; background: var(--red); flex-shrink: 0; }
+
+    .title-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 64px 80px 56px;
+      min-height: 0;
+    }
+
+    .kicker {
+      font-family: "Red Hat Display", sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--red-bright);
+    }
+
+    .title-body h1 {
+      font-family: "Red Hat Display", sans-serif;
+      font-weight: 900;
+      font-size: clamp(48px, 7.2vw, 92px);
+      line-height: 0.92;
+      letter-spacing: -0.03em;
+      margin-top: 36px;
+      max-width: 14ch;
+    }
+
+    .title-version {
+      margin-top: 28px;
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+      font-family: "Red Hat Display", sans-serif;
+      font-size: clamp(28px, 3.4vw, 42px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .title-version::before {
+      content: "";
+      width: 56px;
+      height: 4px;
+      background: var(--red);
+    }
+
+    .ga {
+      margin-left: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      color: var(--red-bright);
+      vertical-align: middle;
+    }
+
+    .title-sub {
+      margin-top: 20px;
+      color: var(--muted);
+      font-size: 20px;
+      max-width: 48ch;
+    }
+
+    .title-footer {
+      margin-top: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 32px;
+      padding-top: 48px;
+      border-top: 1px solid var(--line);
+    }
+
+    .author-block .by {
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: 6px;
+    }
+
+    .author-block .name {
+      font-family: "Red Hat Display", sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .meta-col {
+      text-align: right;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .meta-col strong { color: var(--ink); font-weight: 600; }
+
+    .slide-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 36px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .slide-head h2 {
+      font-family: "Red Hat Display", sans-serif;
+      font-size: 34px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .section-tag {
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--dim);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      flex: 1;
+    }
+
+    .card {
+      background: var(--bg-2);
+      border: 1px solid var(--line);
+      padding: 22px 24px;
+    }
+
+    .card h3 {
+      font-family: "Red Hat Display", sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .card p, .card li {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    .card ul { padding-left: 18px; }
+    .card li { margin: 6px 0; }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat {
+      background: var(--bg-2);
+      border-top: 3px solid var(--red);
+      padding: 18px 20px;
+    }
+
+    .stat .n {
+      font-family: "Red Hat Display", sans-serif;
+      font-size: 36px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+    }
+
+    .stat .l {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+
+    th {
+      text-align: left;
+      font-weight: 600;
+      color: var(--dim);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    td {
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      color: var(--ink);
+    }
+
+    td.muted { color: var(--muted); }
+
+    .pill {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border: 1px solid var(--line);
+      color: var(--muted);
+    }
+
+    .pill.req { color: #f8d7d5; border-color: #5c1a16; background: #2c1110; }
+    .pill.ok { color: #c8e4c4; border-color: #2d4a28; background: #1a2a18; }
+    .pill.new { color: #f5e6b8; border-color: #5c4a12; background: #2a220c; }
+    .pill.gone { color: #c8e4c4; border-color: #2d4a28; background: #1a2a18; }
+
+    code, .mono {
+      font-family: "Red Hat Mono", ui-monospace, monospace;
+      font-size: 12.5px;
+    }
+
+    .work-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 28px;
+      counter-reset: w;
+    }
+
+    .work-list li {
+      list-style: none;
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .work-list li::before {
+      counter-increment: w;
+      content: counter(w, decimal-leading-zero);
+      font-family: "Red Hat Display", sans-serif;
+      font-weight: 700;
+      color: var(--red-bright);
+      font-size: 18px;
+    }
+
+    .work-list strong { display: block; font-size: 16px; }
+    .work-list span { color: var(--muted); font-size: 13px; }
+
+    .arch {
+      font-family: "Red Hat Mono", ui-monospace, monospace;
+      font-size: 15px;
+      line-height: 1.7;
+      background: var(--bg-2);
+      border: 1px solid var(--line);
+      padding: 24px 28px;
+      color: var(--ink);
+    }
+
+    .arch .ns { color: var(--muted); }
+
+    .nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      background: var(--bg);
+      border-top: 1px solid var(--line);
+      z-index: 10;
+    }
+
+    .nav button {
+      background: transparent;
+      color: var(--ink);
+      border: 1px solid var(--line);
+      padding: 8px 16px;
+      font-family: inherit;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .nav button:hover { border-color: var(--muted); }
+    .nav button:disabled { opacity: 0.3; cursor: default; }
+
+    .progress { color: var(--dim); font-size: 12px; letter-spacing: 0.08em; }
+    .hint { color: var(--dim); font-size: 12px; }
+    a { color: var(--ink); }
+    .stack { display: flex; flex-direction: column; gap: 16px; }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 28px;
+      flex: 1;
+    }
+
+    .check { color: #6ec664; margin-right: 8px; }
+
+    .ver {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .ver a { color: var(--muted); text-decoration: none; }
+    .ver a.on { color: var(--ink); font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="deck" id="deck">
+
+    <section class="slide title-slide active" data-title="Title">
+      <div class="title-rail"></div>
+      <div class="title-body">
+        <div class="kicker">Models as a Service · Disconnected Cluster · GA</div>
+        <h1>Disconnected Environment</h1>
+        <div class="title-version">RHOAI 3.5 <span class="ga">GA</span></div>
+        <p class="title-sub">MaaS modularization, disconnected workarounds, and validation on OpenShift AI 3.5.0.</p>
+        <div class="title-footer">
+          <div class="author-block">
+            <div class="by">By</div>
+            <div class="name">Somya Bhatnagar</div>
+          </div>
+          <div class="meta-col">
+            <div><strong>RHOAIENG-38241</strong></div>
+            <div>31 Jul 2026</div>
+            <div>maas-dis-aws-rhoai-3-5</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Agenda">
+      <div class="slide-head">
+        <h2>Agenda</h2>
+        <div class="section-tag">Overview</div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Environment</h3>
+          <ul>
+            <li>Cluster, OCP 4.21.6, RHOAI 3.5.0</li>
+            <li>Modularization: no KServe</li>
+            <li>Install via FBC + DSC patch</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Workarounds</h3>
+          <ul>
+            <li>Seven disconnected-cluster patches</li>
+            <li>What dropped from 3.4</li>
+            <li>ExternalModel custom HTTP backend</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Validation</h3>
+          <ul>
+            <li>Part 1: eight readiness tests</li>
+            <li>Part 2: five smoke tests</li>
+            <li>Part 3: AITenant multitenancy</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Outcome</h3>
+          <ul>
+            <li>8/8 readiness, 5/5 smoke</li>
+            <li>15/15 multitenancy checks</li>
+            <li>Troubleshooting map</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Cluster">
+      <div class="slide-head">
+        <h2>Cluster context</h2>
+        <div class="section-tag">Environment</div>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="n">3.5.0</div><div class="l">RHOAI GA under test</div></div>
+        <div class="stat"><div class="n">4.21.6</div><div class="l">OpenShift version</div></div>
+        <div class="stat"><div class="n">7</div><div class="l">Workarounds applied</div></div>
+        <div class="stat"><div class="n">0</div><div class="l">Gateway restarts</div></div>
+      </div>
+      <table>
+        <thead>
+          <tr><th>Item</th><th>Value</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Issue</td>
+            <td class="mono"><a href="https://issues.redhat.com/browse/RHOAIENG-38241">RHOAIENG-38241</a></td>
+          </tr>
+          <tr>
+            <td>API</td>
+            <td class="mono muted">https://api.maas-dis-aws-rhoai-3-5.aws.rh-ods.com:6443</td>
+          </tr>
+          <tr>
+            <td>Gateway</td>
+            <td class="mono muted">https://maas.apps.maas-dis-aws-rhoai-3-5.aws.rh-ods.com</td>
+          </tr>
+          <tr>
+            <td>CSV / channel</td>
+            <td class="mono muted">rhods-operator.3.5.0 · stable-3.5</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="slide" data-title="Architecture">
+      <div class="slide-head">
+        <h2>3.5 modularization</h2>
+        <div class="section-tag">No KServe</div>
+      </div>
+      <div class="two-col">
+        <div class="arch">
+          RHOAI Operator<br>
+          └── ai-gateway-operator <span class="ns">redhat-ods-applications</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── maas-controller <span class="ns">redhat-ods-applications</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── MaasTenantConfig <span class="ns">models-as-a-service</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── maas-api <span class="ns">redhat-ai-gateway-infra</span>
+        </div>
+        <div class="stack">
+          <div class="card">
+            <h3>DSC for MaaS</h3>
+            <p><code>aigateway.managementState: Managed</code><br>
+            <code>modelsAsAService: Managed</code><br>
+            <code>kserve: Removed</code></p>
+          </div>
+          <div class="card">
+            <h3>What moved</h3>
+            <p>maas-api now lives in <code>redhat-ai-gateway-infra</code>. Subscriptions live in <code>models-as-a-service</code>. Backends are ExternalModel, not LLMInferenceService.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Install">
+      <div class="slide-head">
+        <h2>Installation</h2>
+        <div class="section-tag">Three steps</div>
+      </div>
+      <div class="stack">
+        <div class="card">
+          <h3>1. Deploy RHOAI from FBC fragment</h3>
+          <p>Jenkins disconnected-setup mirrors the FBC image and runs <code>deploy.sh --channel stable-3.5</code>. If mirroring fails on a new build, re-run the job — no manual steps.</p>
+        </div>
+        <div class="card">
+          <h3>2. Patch DSC</h3>
+          <p>Default DSC has no <code>aigateway</code>. Set MaaS Managed and KServe Removed. Wait for <code>ai-gateway-operator</code> and <code>maas-controller</code> Available. Unmirrored components (dashboard, feast, trustyai, ogx) may also need Removed.</p>
+        </div>
+        <div class="card">
+          <h3>3. MaaSAuthPolicy + MaaSSubscription</h3>
+          <p><code>maas-gateway-auth</code> is created only after the first MaaSAuthPolicy exists. Apply both CRs in <code>models-as-a-service</code>, then wait until the AuthPolicy is Enforced.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="RHOAI 3.5">
+      <div class="slide-head">
+        <h2>New in RHOAI 3.5</h2>
+        <div class="section-tag">Product changes</div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Gateway Programmed: True</h3>
+          <p>Gateway Service is ClusterIP, so Sail/Istio assigns an address. 3.4 stayed AddressNotAssigned. Proxy route is still required for <code>maas.apps.*</code>.</p>
+        </div>
+        <div class="card">
+          <h3>maas-gateway-auth</h3>
+          <p>Auto-created by maas-controller when the first MaaSAuthPolicy exists. Replaces manual Authorino AuthConfig setup.</p>
+        </div>
+        <div class="card">
+          <h3>ExternalModel / ExternalProvider</h3>
+          <p>New <code>inference.opendatahub.io/v1alpha1</code> API for non-KServe backends. Payload-processing + pre-processing run in openshift-ingress.</p>
+        </div>
+        <div class="card">
+          <h3>Inference path</h3>
+          <p>Chat completions: <code>/v1/chat/completions</code> (was <code>/v1/completions</code>). API keys still at <code>/maas-api/v1/api-keys</code>, now with a <code>subscription</code> field.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Workarounds">
+      <div class="slide-head">
+        <h2>Seven workarounds</h2>
+        <div class="section-tag">Disconnected cluster</div>
+      </div>
+      <ol class="work-list">
+        <li><div><strong>Gateway proxy route</strong><span>Hostname maas.${CLUSTER_DOMAIN} — always required</span></div></li>
+        <li><div><strong>Authorino TLS listener off</strong><span>RHCL 1.4.2 gRPC TLS vs Envoy cluster mismatch</span></div></li>
+        <li><div><strong>Service CA + SSL_CERT_FILE</strong><span>Authorino outbound trust to maas-api</span></div></li>
+        <li><div><strong>Gateway memory 2Gi</strong><span>Recommended — WASM OOM under policy churn</span></div></li>
+        <li><div><strong>Custom HTTP server</strong><span>When llm-d-inference-sim is not mirrored</span></div></li>
+        <li><div><strong>HTTPRoute + DestinationRule</strong><span>ClusterIP:8000, tls mode DISABLE</span></div></li>
+        <li><div><strong>ipp-managed secret label</strong><span>payload-processing credential store</span></div></li>
+      </ol>
+    </section>
+
+    <section class="slide" data-title="Workarounds 1–4">
+      <div class="slide-head">
+        <h2>Workarounds 1–4</h2>
+        <div class="section-tag">Infrastructure</div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h3>1. Gateway proxy route <span class="pill req">Mandatory</span></h3>
+          <p>Route <code>maas-gateway</code> in openshift-ingress to <code>maas-default-gateway-openshift-default</code>, host <code>maas.${CLUSTER_DOMAIN}</code>, TLS edge + redirect.</p>
+        </div>
+        <div class="card">
+          <h3>2. Authorino gRPC TLS <span class="pill req">Mandatory</span></h3>
+          <p>RHCL 1.4.2 enables Authorino listener TLS but Envoy’s kuadrant-auth-service cluster has no transport_socket. Disable listener TLS or auth fails silently.</p>
+        </div>
+        <div class="card">
+          <h3>3. Service CA bundle <span class="pill req">Mandatory</span></h3>
+          <p>Inject <code>service-ca-bundle</code> in kuadrant-system, mount it, set <code>SSL_CERT_FILE</code> and <code>REQUESTS_CA_BUNDLE</code> on Authorino.</p>
+        </div>
+        <div class="card">
+          <h3>4. Gateway memory 2Gi <span class="pill new">Recommended</span></h3>
+          <p>WASM shim plus VM overhead exceeds the 1Gi default under policy reloads. Patch <code>maas-default-gateway-config</code> (also set WASM_INSECURE_REGISTRIES to bastion).</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Workarounds 5–7">
+      <div class="slide-head">
+        <h2>Workarounds 5–7</h2>
+        <div class="section-tag">Custom HTTP backend</div>
+      </div>
+      <div class="stack">
+        <div class="card">
+          <h3>5. Custom HTTP server <span class="pill req">If sim image missing</span></h3>
+          <p>Python OpenAI stub in a ConfigMap, deployed with the bastion PostgreSQL image. ExternalProvider + ExternalModel + MaaSModelRef with <code>endpointOverride</code> on port 8000. Service name: <code>sim-http-backend</code>.</p>
+        </div>
+        <div class="card">
+          <h3>6. HTTPRoute and DestinationRule <span class="pill req">Mandatory for HTTP</span></h3>
+          <p>ai-gateway-operator points at ExternalName:443 with tls SIMPLE. Patch all HTTPRoute rules to <code>sim-http-backend:8000</code> and set DestinationRule tls DISABLE. Operator may revert — re-apply on 503 / cluster_not_found.</p>
+        </div>
+        <div class="card">
+          <h3>7. Secret label <span class="pill req">Mandatory</span></h3>
+          <p>Label <code>sim-provider-key</code> with <code>inference.llm-d.ai/ipp-managed=true</code>. Without it, payload-processing ignores the secret and inference fails with <code>authType 'apikey' credentials not found</code>.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Dropped from 3.4">
+      <div class="slide-head">
+        <h2>Dropped from 3.4</h2>
+        <div class="section-tag">No longer needed</div>
+      </div>
+      <table>
+        <thead>
+          <tr><th>Workaround</th><th>3.4</th><th>3.5</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>WasmPlugin bastion pull secret</td><td>Required</td><td class="muted">Not needed — no WasmPlugin</td></tr>
+          <tr><td>PostgreSQL bastion image patch</td><td>Required</td><td class="muted">IDMS auto-mirrors rhel9</td></tr>
+          <tr><td>NetworkPolicy Gateway → maas-api</td><td>Required</td><td class="muted">Auto-created by maas-controller</td></tr>
+          <tr><td>HTTPRoute URL rewrite</td><td>Required</td><td class="muted">ai-gateway-operator handles routing</td></tr>
+          <tr><td>LLMInferenceService / KServe</td><td>Required</td><td class="muted">Replaced by ExternalModel</td></tr>
+          <tr><td>Authorino TLS (outbound)</td><td>Required</td><td>Still required — plus gRPC listener off</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="slide" data-title="Readiness">
+      <div class="slide-head">
+        <h2>Part 1 — Readiness tests</h2>
+        <div class="section-tag">Tests 1–8</div>
+      </div>
+      <table>
+        <thead>
+          <tr><th>#</th><th>Check</th><th>Expected</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>Authorino / Limitador pods</td><td class="muted">Running 1/1 in kuadrant-system</td></tr>
+          <tr><td>2</td><td>Gateway status</td><td class="muted">Accepted True, Programmed True (3.5 change)</td></tr>
+          <tr><td>3</td><td>MaaSModelRef + backend pod</td><td class="muted">Phase=Ready; custom server Running</td></tr>
+          <tr><td>4</td><td>Gateway controller env</td><td class="muted">openshift.io/gateway-controller/v1</td></tr>
+          <tr><td>5</td><td>AuthConfig status</td><td class="muted">READY true from maas-gateway-auth</td></tr>
+          <tr><td>6</td><td>MaaS CRs</td><td class="muted">ModelRef Ready; AuthPolicy/Subscription Active</td></tr>
+          <tr><td>7</td><td>maas-api / controller / ai-gateway</td><td class="muted">All deployments 1/1</td></tr>
+          <tr><td>8</td><td>Route + HTTPRoutes</td><td class="muted">maas.apps.* ; model + maas-api HTTPRoutes</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="slide" data-title="Smoke">
+      <div class="slide-head">
+        <h2>Part 2 — Smoke tests</h2>
+        <div class="section-tag">Tests 9–13</div>
+      </div>
+      <table>
+        <thead>
+          <tr><th>#</th><th>Test</th><th>Expected</th><th></th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>9</td>
+            <td>List models with OpenShift token</td>
+            <td class="muted"><code>GET /v1/models</code> — ready true, simulator-subscription</td>
+            <td><span class="pill ok">Pass</span></td>
+          </tr>
+          <tr>
+            <td>10</td>
+            <td>API key generation</td>
+            <td class="muted"><code>POST /maas-api/v1/api-keys</code> with subscription field — sk-oai-*</td>
+            <td><span class="pill ok">Pass</span></td>
+          </tr>
+          <tr>
+            <td>11</td>
+            <td>Authenticated inference</td>
+            <td class="muted"><code>POST …/v1/chat/completions</code> — simulated chat text</td>
+            <td><span class="pill ok">Pass</span></td>
+          </tr>
+          <tr>
+            <td>12</td>
+            <td>Unauthenticated inference</td>
+            <td class="muted">HTTP 401 without credentials</td>
+            <td><span class="pill ok">Pass</span></td>
+          </tr>
+          <tr>
+            <td>13</td>
+            <td>Rate limit config (16 requests)</td>
+            <td class="muted">All HTTP 200; 10k tokens/min not exhausted</td>
+            <td><span class="pill ok">Pass</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="slide" data-title="Multitenancy">
+      <div class="slide-head">
+        <h2>Part 3 — Multitenancy</h2>
+        <div class="section-tag">AITenant</div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <h3>What 3.5.0 covers</h3>
+          <ul>
+            <li>Per-tenant namespace, Gateway, MaasTenantConfig, RBAC</li>
+            <li>Per-tenant maas-api and payload-processing</li>
+            <li>API key isolation and cross-tenant rejection</li>
+            <li>Two concurrent AITenants</li>
+            <li>Deletion: children cleaned, namespace kept</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Disconnected extra</h3>
+          <p>New tenant Gateways need an infrastructure ConfigMap with <code>type: ClusterIP</code> or they stay unprogrammed (no cloud LoadBalancer). The default gateway already has this from Jenkins; test-created gateways do not.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Status">
+      <div class="slide-head">
+        <h2>Component status</h2>
+        <div class="section-tag">Session result</div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <h3>Infrastructure</h3>
+          <ul>
+            <li><span class="check">●</span>maas-api 1/1 — redhat-ai-gateway-infra</li>
+            <li><span class="check">●</span>maas-controller 1/1 — redhat-ods-applications</li>
+            <li><span class="check">●</span>ai-gateway-operator 1/1</li>
+            <li><span class="check">●</span>PostgreSQL 1/1 — rhel9/postgresql-15 via IDMS</li>
+            <li><span class="check">●</span>Gateway Accepted + Programmed, proxy route</li>
+            <li><span class="check">●</span>Authorino — TLS listener off, SSL_CERT_FILE set</li>
+            <li><span class="check">●</span>Limitador — rate limiting functional</li>
+            <li><span class="check">●</span>payload-processing + pre-processing 1/1</li>
+            <li><span class="check">●</span>Custom HTTP server 1/1</li>
+          </ul>
+        </div>
+        <div class="stack">
+          <div class="card">
+            <h3>Custom resources</h3>
+            <p>MaaSModelRef: 1 Ready<br>MaaSAuthPolicy: 1 Active<br>MaaSSubscription: 1 Active<br>maas-gateway-auth: Accepted + Enforced<br>AuthConfigs: Ready</p>
+          </div>
+          <div class="card">
+            <h3>Functionality</h3>
+            <p>Discovery, API keys, chat completions, 401 enforcement, and 10,000 tokens/min rate limit all operational.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Troubleshooting">
+      <div class="slide-head">
+        <h2>Troubleshooting</h2>
+        <div class="section-tag">Quick map</div>
+      </div>
+      <table>
+        <thead>
+          <tr><th>Symptom</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Gateway OOMKilled / CrashLoop</td>
+            <td class="muted">Set 2Gi in maas-default-gateway-config. If it persists, restart kuadrant-operator-controller-manager.</td>
+          </tr>
+          <tr>
+            <td>AUTH_FAILURE on API key create</td>
+            <td class="muted">Disable Authorino listener TLS; set SSL_CERT_FILE.</td>
+          </tr>
+          <tr>
+            <td>Inference cluster_not_found</td>
+            <td class="muted">Patch HTTPRoute backend to sim-http-backend:8000 (operator may revert).</td>
+          </tr>
+          <tr>
+            <td>upstream TLS_error</td>
+            <td class="muted">DestinationRule tls mode DISABLE.</td>
+          </tr>
+          <tr>
+            <td>apikey credentials not found</td>
+            <td class="muted">Label secret inference.llm-d.ai/ipp-managed=true.</td>
+          </tr>
+          <tr>
+            <td>maas-gateway-auth missing</td>
+            <td class="muted">Create MaaSAuthPolicy first (install step 3).</td>
+          </tr>
+          <tr>
+            <td>Bundle ImagePullBackOff</td>
+            <td class="muted">Re-run Jenkins disconnected-setup to remirror the operator bundle.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="slide" data-title="Results">
+      <div class="slide-head">
+        <h2>Session outcome</h2>
+        <div class="section-tag">31 Jul 2026</div>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="n">8/8</div><div class="l">Readiness tests passed</div></div>
+        <div class="stat"><div class="n">5/5</div><div class="l">Smoke tests passed</div></div>
+        <div class="stat"><div class="n">15/15</div><div class="l">Multitenancy checks passed</div></div>
+        <div class="stat"><div class="n">0</div><div class="l">Gateway restarts</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Still required after 3.5</h3>
+          <ul>
+            <li>Proxy route, Authorino TLS off, Service CA</li>
+            <li>Gateway 2Gi under heavy policy churn</li>
+            <li>Custom HTTP stack until the simulator image is mirrored</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Gone in 3.5</h3>
+          <ul>
+            <li>WasmPlugin pull secret, Postgres image patch</li>
+            <li>Manual NetworkPolicy and URL rewrite</li>
+            <li>KServe / LLMInferenceService</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <nav class="nav">
+    <button type="button" id="prev">← Previous</button>
+    <div class="progress"><span id="page">1</span> / <span id="total">16</span> · <span id="label">Title</span></div>
+    <div class="ver">
+      <a href="index.html">3.4</a>
+      <a class="on" href="3.5.html">3.5</a>
+    </div>
+    <div class="hint">Arrow keys · Space</div>
+    <button type="button" id="next">Next →</button>
+  </nav>
+
+  <script>
+    const slides = [...document.querySelectorAll(".slide")];
+    const pageEl = document.getElementById("page");
+    const totalEl = document.getElementById("total");
+    const labelEl = document.getElementById("label");
+    const prevBtn = document.getElementById("prev");
+    const nextBtn = document.getElementById("next");
+    let i = 0;
+
+    totalEl.textContent = String(slides.length);
+
+    function show(n) {
+      i = Math.max(0, Math.min(slides.length - 1, n));
+      slides.forEach((s, idx) => s.classList.toggle("active", idx === i));
+      pageEl.textContent = String(i + 1);
+      labelEl.textContent = slides[i].dataset.title || "";
+      prevBtn.disabled = i === 0;
+      nextBtn.disabled = i === slides.length - 1;
+      history.replaceState(null, "", "#" + (i + 1));
+    }
+
+    prevBtn.addEventListener("click", () => show(i - 1));
+    nextBtn.addEventListener("click", () => show(i + 1));
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") {
+        e.preventDefault();
+        show(i + 1);
+      } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
+        e.preventDefault();
+        show(i - 1);
+      } else if (e.key === "Home") {
+        show(0);
+      } else if (e.key === "End") {
+        show(slides.length - 1);
+      }
+    });
+
+    const fromHash = parseInt(location.hash.replace("#", ""), 10);
+    show(Number.isFinite(fromHash) && fromHash > 0 ? fromHash - 1 : 0);
+  </script>
+</body>
+</html>
