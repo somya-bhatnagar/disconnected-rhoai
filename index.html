@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;700;900&family=Red+Hat+Text:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
-    :root {
+    :root, html[data-theme="dark"] {
       --bg: #0c0c0c;
       --bg-2: #161616;
       --ink: #f4f4f4;
@@ -17,6 +17,19 @@
       --red: #c9190b;
       --red-bright: #ee0000;
       --line: #2c2c2c;
+      color-scheme: dark;
+    }
+
+    html[data-theme="light"] {
+      --bg: #f4f4f4;
+      --bg-2: #ffffff;
+      --ink: #151515;
+      --muted: #4a4a4a;
+      --dim: #6a6a6a;
+      --red: #c9190b;
+      --red-bright: #a30000;
+      --line: #d2d2d2;
+      color-scheme: light;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -113,13 +126,42 @@
       font-weight: 700;
     }
 
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 24px;
+      z-index: 20;
+      background: var(--bg-2);
+      color: var(--ink);
+      border: 1px solid var(--line);
+      padding: 8px 14px;
+      font-family: inherit;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .theme-toggle:hover { border-color: var(--muted); }
+
     @media (max-width: 720px) {
       .body { padding: 40px 28px 36px; }
       .cards { grid-template-columns: 1fr; }
     }
   </style>
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("disconnected-rhoai-theme");
+        document.documentElement.setAttribute("data-theme", t === "light" ? "light" : "dark");
+      } catch (e) {
+        document.documentElement.setAttribute("data-theme", "dark");
+      }
+    })();
+  </script>
 </head>
 <body>
+  <button type="button" id="theme-toggle" class="theme-toggle" aria-pressed="false">Light mode</button>
   <div class="page">
     <div class="rail"></div>
     <div class="body">
@@ -140,5 +182,6 @@
       </div>
     </div>
   </div>
+  <script src="theme.js"></script>
 </body>
 </html>

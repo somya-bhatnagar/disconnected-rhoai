@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;700;900&family=Red+Hat+Mono:wght@400;500&family=Red+Hat+Text:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
-    :root {
+    :root, html[data-theme="dark"] {
       --bg: #0c0c0c;
       --bg-2: #161616;
       --bg-3: #1f1f1f;
@@ -18,8 +18,22 @@
       --red: #c9190b;
       --red-bright: #ee0000;
       --line: #2c2c2c;
-      --ok: #3e8635;
-      --warn: #f0ab00;
+      --code: #e8e8e8;
+      color-scheme: dark;
+    }
+
+    html[data-theme="light"] {
+      --bg: #f4f4f4;
+      --bg-2: #ffffff;
+      --bg-3: #ececec;
+      --ink: #151515;
+      --muted: #4a4a4a;
+      --dim: #6a6a6a;
+      --red: #c9190b;
+      --red-bright: #a30000;
+      --line: #d2d2d2;
+      --code: #1f1f1f;
+      color-scheme: light;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -274,6 +288,10 @@
     .pill.ok { color: #c8e4c4; border-color: #2d4a28; background: #1a2a18; }
     .pill.new { color: #f5e6b8; border-color: #5c4a12; background: #2a220c; }
 
+    html[data-theme="light"] .pill.req { color: #5c1a16; border-color: #f0b4ae; background: #fce8e6; }
+    html[data-theme="light"] .pill.ok { color: #1e4a1a; border-color: #b8d4b4; background: #e8f5e6; }
+    html[data-theme="light"] .pill.new { color: #5c4a12; border-color: #e6d48a; background: #faf3d6; }
+
     code, .mono {
       font-family: "Red Hat Mono", ui-monospace, monospace;
       font-size: 12.5px;
@@ -284,7 +302,7 @@
       border: 1px solid var(--line);
       padding: 14px 16px;
       overflow-x: auto;
-      color: #e8e8e8;
+      color: var(--code);
       line-height: 1.45;
       font-family: "Red Hat Mono", ui-monospace, monospace;
       font-size: 12.5px;
@@ -382,7 +400,32 @@
     }
 
     .check { color: #6ec664; margin-right: 8px; }
+    html[data-theme="light"] .check { color: #3e8635; }
+
+    .theme-toggle {
+      background: transparent;
+      color: var(--ink);
+      border: 1px solid var(--line);
+      padding: 8px 14px;
+      font-family: inherit;
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .theme-toggle:hover { border-color: var(--muted); }
   </style>
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("disconnected-rhoai-theme");
+        document.documentElement.setAttribute("data-theme", t === "light" ? "light" : "dark");
+      } catch (e) {
+        document.documentElement.setAttribute("data-theme", "dark");
+      }
+    })();
+  </script>
 </head>
 <body>
   <div class="deck" id="deck">
@@ -769,6 +812,7 @@
       <a class="on" href="3.4.html">3.4</a>
       <a href="3.5.html">3.5</a>
     </div>
+    <button type="button" id="theme-toggle" class="theme-toggle" aria-pressed="false">Light mode</button>
     <div class="hint">Arrow keys · Space</div>
     <button type="button" id="next">Next →</button>
   </nav>
@@ -798,6 +842,7 @@
     nextBtn.addEventListener("click", () => show(i + 1));
 
     document.addEventListener("keydown", (e) => {
+      if (e.target.closest("button, a, input, textarea")) return;
       if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") {
         e.preventDefault();
         show(i + 1);
@@ -814,5 +859,6 @@
     const fromHash = parseInt(location.hash.replace("#", ""), 10);
     show(Number.isFinite(fromHash) && fromHash > 0 ? fromHash - 1 : 0);
   </script>
+  <script src="theme.js"></script>
 </body>
 </html>
