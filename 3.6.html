@@ -260,6 +260,15 @@
 
     td.muted { color: var(--muted); }
 
+    td.cell-ellipsis {
+      max-width: 0;
+      width: 58%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      cursor: help;
+    }
+
     .pill {
       display: inline-block;
       font-size: 11px;
@@ -489,7 +498,7 @@
         <tbody>
           <tr>
             <td>FBC fragment</td>
-            <td class="mono muted">quay.io/rhoai/rhoai-fbc-fragment@sha256:4d71a830…</td>
+            <td class="mono muted cell-ellipsis" title="quay.io/rhoai/rhoai-fbc-fragment@sha256:4d71a830f36f9bfeed7daa84d8e57bbba3d9f82850106d071e49e5a59e9b0e68">quay.io/rhoai/rhoai-fbc-fragment@sha256:4d71a830…</td>
           </tr>
           <tr>
             <td>API</td>
