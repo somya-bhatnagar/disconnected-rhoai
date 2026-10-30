@@ -21,7 +21,7 @@ GitHub Pages serves static HTML only (`.nojekyll` disables Jekyll).
 
 **3.5** — Modularization (RHOAI operator → ai-gateway-operator → maas-controller, ExternalModel instead of KServe), install via FBC + DSC, **seven** workarounds, what **dropped from 3.4**, readiness / smoke / **AITenant multitenancy** (15 checks), troubleshooting.
 
-**3.6** — GA validation on **`maas-dis-aws-36`** (OCP 4.22.20, RHOAI 3.6.0, RHCL 1.5.0). Same seven disconnected workarounds as 3.5; **3.5 → 3.6 delta** (nothing removed—workaround **6** uses Service **443→8000** + DestinationRule TLS **DISABLE** when the operator keeps HTTPRoute on `provider-*:443`). The **3.4 WasmPlugin pull-secret workaround is not required** (gateway uses `WASM_INSECURE_REGISTRIES`; a legacy `wasm-plugin-pull-secret` in `openshift-ingress` may remain from disconnected install). Readiness 8/8, smoke 5/5, AITenant multitenancy (same 15-check matrix as 3.5), Praxis default + tenant, session outcome and troubleshooting.
+**3.6** — GA validation on **`maas-dis-aws-36`** (OCP 4.22.20, RHOAI 3.6.0, RHCL 1.5.0). Same seven disconnected workarounds as 3.5; **3.5 → 3.6 delta** (nothing removed—workaround **6** uses Service **443→8000** + DestinationRule TLS **DISABLE** when the operator keeps HTTPRoute on `provider-*:443`). The **3.4 WasmPlugin pull-secret workaround is not required** (gateway uses `WASM_INSECURE_REGISTRIES`; Jenkins **`configure-disconnected-rhcl.sh`** may still create `wasm-plugin-pull-secret` in `openshift-ingress`). Readiness 8/8, smoke 5/5, AITenant multitenancy (same 15-check matrix as 3.5), Praxis default + tenant, session outcome and troubleshooting.
 
 ## 3.6 validation (reference cluster)
 
