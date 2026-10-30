@@ -465,7 +465,7 @@
           <h3>Workarounds</h3>
           <ul>
             <li>Seven disconnected-cluster patches</li>
-            <li>What dropped from 3.4</li>
+            <li>3.5 → 3.6 workaround changes (nothing removed)</li>
             <li>ExternalModel custom HTTP backend</li>
           </ul>
         </div>
@@ -665,24 +665,31 @@
       </div>
     </section>
 
-    <section class="slide" data-title="Dropped from 3.4">
+    <section class="slide" data-title="3.5 to 3.6">
       <div class="slide-head">
-        <h2>Dropped from 3.4</h2>
-        <div class="section-tag">No longer needed</div>
+        <h2>3.5 → 3.6 disconnected delta</h2>
+        <div class="section-tag">Workarounds</div>
       </div>
-      <table>
-        <thead>
-          <tr><th>Workaround</th><th>3.4</th><th>3.5</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>WasmPlugin bastion pull secret</td><td>Required</td><td class="muted">Not needed — no WasmPlugin</td></tr>
-          <tr><td>PostgreSQL bastion image patch</td><td>Required</td><td class="muted">IDMS auto-mirrors rhel9</td></tr>
-          <tr><td>NetworkPolicy Gateway → maas-api</td><td>Required</td><td class="muted">Auto-created by maas-controller</td></tr>
-          <tr><td>HTTPRoute URL rewrite</td><td>Required</td><td class="muted">ai-gateway-operator handles routing</td></tr>
-          <tr><td>LLMInferenceService / KServe</td><td>Required</td><td class="muted">Replaced by ExternalModel</td></tr>
-          <tr><td>Authorino TLS (outbound)</td><td>Required</td><td>Still required — plus gRPC listener off</td></tr>
-        </tbody>
-      </table>
+      <div class="two-col">
+        <div class="card">
+          <h3>Still not needed (dropped in 3.5, unchanged in 3.6)</h3>
+          <ul>
+            <li>WasmPlugin bastion pull secret <span class="muted">(not required for MaaS — no WasmPlugin CRs; <code>wasm-plugin-pull-secret</code> may still exist from disconnected setup)</span></li>
+            <li>Manual PostgreSQL image patch</li>
+            <li>Manual NetworkPolicy Gateway → maas-api</li>
+            <li>HTTPRoute URL rewrite</li>
+            <li>KServe / LLMInferenceService path</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Changed on 3.6 GA</h3>
+          <ul>
+            <li><strong>Workaround 6:</strong> operator keeps HTTPRoute on <code>provider-*:443</code> — use Service <strong>443→8000</strong> + DestinationRule TLS <strong>DISABLE</strong> (3.5 often patched route to :8000; operator reverts)</li>
+            <li><strong>RHCL 1.5.0</strong> — same Authorino listener TLS off + service CA as 3.5</li>
+            <li><strong>Seven workarounds</strong> still required; none removed vs 3.5</li>
+          </ul>
+        </div>
+      </div>
     </section>
 
     <section class="slide" data-title="Readiness">
@@ -900,11 +907,11 @@
           </ul>
         </div>
         <div class="card">
-          <h3>Carried from 3.5</h3>
+          <h3>vs 3.5</h3>
           <ul>
-            <li>WasmPlugin pull secret, Postgres image patch</li>
-            <li>Manual NetworkPolicy and URL rewrite</li>
-            <li>KServe / LLMInferenceService</li>
+            <li>Same seven disconnected workarounds</li>
+            <li>Stub path: Service 443→8000 + DR DISABLE (3.6)</li>
+            <li>See <a href="3.5.html">3.5 deck</a> for 3.4→3.5 drops</li>
           </ul>
         </div>
       </div>
