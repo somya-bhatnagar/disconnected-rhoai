@@ -36,3 +36,4 @@ Then open [http://127.0.0.1:8765/](http://127.0.0.1:8765/) for the home page, or
 - `3.5.html` — RHOAI 3.5 GA deck
 - `3.6.html` — RHOAI 3.6 GA deck
 - `3.6-validation-checklist.md` — cluster validation notes (not published to Pages)
+- `scripts/validate-36-ga.sh` — re-run W1–7, R1–8, T9–13, MT9–11, Praxis checks against a logged-in cluster (`oc`)
